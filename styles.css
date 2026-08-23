@@ -105,6 +105,18 @@ button {
 }
 .taste-link:active { opacity: 0.7; }
 
+.site-footer { padding: 8px 20px 24px; text-align: center; }
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.github-link:active { opacity: 0.7; }
+
 /* ---------- TUNE ---------- */
 .tune-header {
   display: flex;
