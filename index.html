@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#1c1512" />
+<title>Pour Over Timer</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<section id="screen-home" class="screen screen-light active">
+  <header class="home-header">
+    <h1>Pour Over</h1>
+    <p class="subtitle">Choose a recipe to brew</p>
+  </header>
+  <div id="recipe-list" class="recipe-list"></div>
+
+  <section class="tasting-notes">
+    <h3 class="steps-title">Dial In The Taste</h3>
+    <div class="taste-list">
+      <div class="taste-row">
+        <span class="taste-symptom">Too Fast / Acidic</span>
+        <span class="taste-arrow">&rarr;</span>
+        <span class="taste-fix">Grind Finer</span>
+      </div>
+      <div class="taste-row">
+        <span class="taste-symptom">Too Slow / Bitter</span>
+        <span class="taste-arrow">&rarr;</span>
+        <span class="taste-fix">Grind Coarser</span>
+      </div>
+    </div>
+    <a
+      class="taste-link"
+      href="https://www.baristahustle.com/app-archive-main/the-coffee-compass/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >The Coffee Compass &rarr;</a>
+  </section>
+
+  <section class="help-section">
+    <h3 class="steps-title">Help</h3>
+    <p class="help-text">
+      Screen falling asleep mid-brew? Trust this device's certificate once
+      to fix it.
+    </p>
+    <a class="taste-link" href="/rootCA.pem">Download Certificate &rarr;</a>
+    <p class="help-hint">
+      After downloading: Settings &rarr; General &rarr; VPN &amp; Device
+      Management &rarr; Install, then Settings &rarr; General &rarr; About
+      &rarr; Certificate Trust Settings &rarr; enable full trust.
+    </p>
+  </section>
+</section>
+
+<!-- TUNE SCREEN -->
+<section id="screen-tune" class="screen screen-light">
+  <header class="tune-header">
+    <button id="tune-back" class="icon-btn" aria-label="Back">&#8592;</button>
+    <h2 id="tune-title">Recipe</h2>
+    <span class="icon-btn spacer"></span>
+  </header>
+
+  <div class="tune-body">
+    <div class="size-row" id="size-row"></div>
+
+    <div class="dose-row">
+      <button id="dose-minus" class="stepper-btn" aria-label="Decrease dose">&minus;</button>
+      <div class="dose-display">
+        <span id="dose-value">25</span><span class="dose-unit">g coffee</span>
+      </div>
+      <button id="dose-plus" class="stepper-btn" aria-label="Increase dose">&plus;</button>
+    </div>
+
+    <div class="totals-row">
+      <div class="total-chip">
+        <span class="total-icon">&#9749;</span>
+        <span id="total-coffee">25 g</span>
+      </div>
+      <div class="total-chip">
+        <span class="total-icon">&#128167;</span>
+        <span id="total-water">375 g</span>
+      </div>
+      <div class="total-chip">
+        <span class="total-icon">&#9881;&#65039;</span>
+        <span id="total-grind">Medium-coarse</span>
+      </div>
+    </div>
+
+    <div id="dialin-section" class="dialin-section">
+      <h3 class="steps-title">Dial In The Taste</h3>
+      <div class="dialin-row">
+        <span class="dialin-label">Balance</span>
+        <div id="balance-seg" class="segmented"></div>
+      </div>
+      <div class="dialin-row">
+        <span class="dialin-label">Strength</span>
+        <div id="strength-seg" class="segmented"></div>
+      </div>
+      <div id="pour-chart" class="pour-chart"></div>
+      <div class="pour-chart-legend">
+        <span class="legend-item"><i class="legend-swatch legend-taste"></i>Balance</span>
+        <span class="legend-item"><i class="legend-swatch legend-strength"></i>Strength</span>
+      </div>
+    </div>
+
+    <h3 class="steps-title">Pour Schedule</h3>
+    <div id="step-list" class="step-list"></div>
+  </div>
+
+  <div class="tune-footer">
+    <button id="start-btn" class="primary-btn">Start Timer</button>
+  </div>
+</section>
+
+<!-- TIMER SCREEN -->
+<section id="screen-timer" class="screen screen-dark">
+  <header class="timer-header">
+    <button id="timer-close" class="icon-btn dark" aria-label="Close">&times;</button>
+    <div class="timer-title-wrap">
+      <h2 id="timer-recipe-name">Recipe</h2>
+      <span id="timer-progress-label" class="timer-progress-label">Step 1 of 5</span>
+    </div>
+    <button id="timer-restart" class="icon-btn dark" aria-label="Restart">&#8635;</button>
+  </header>
+
+  <div class="ring-wrap">
+    <svg class="ring" viewBox="0 0 240 240">
+      <circle class="ring-track" cx="120" cy="120" r="108" />
+      <circle id="ring-progress" class="ring-progress" cx="120" cy="120" r="108" />
+    </svg>
+    <div class="ring-center">
+      <span id="timer-clock">0:45</span>
+    </div>
+  </div>
+
+  <div class="instruction-wrap">
+    <p id="instruction-main">Pour to 75 g total</p>
+    <p id="instruction-note">Bloom — gently swirl</p>
+    <p id="instruction-next">Next: pour to 150 g total</p>
+  </div>
+
+  <div class="timer-controls">
+    <button id="skip-back" class="control-btn" aria-label="Previous step">&#9198;</button>
+    <button id="play-pause" class="control-btn primary" aria-label="Pause">&#10074;&#10074;</button>
+    <button id="skip-fwd" class="control-btn" aria-label="Next step">&#9197;</button>
+  </div>
+</section>
+
+<!-- DONE SCREEN -->
+<section id="screen-done" class="screen screen-dark">
+  <div class="done-body">
+    <span class="done-icon">&#9749;</span>
+    <h2>Brew complete</h2>
+    <p id="done-time">Total time 3:30</p>
+    <button id="done-btn" class="primary-btn">New Brew</button>
+  </div>
+</section>
+
+<script src="recipes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
