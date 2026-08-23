@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A static web app for timing pour-over coffee brews. Pick a recipe (4:6 Method
+**Grounds Control** — a static web app for timing pour-over coffee brews.
+Pick a recipe (4:6 Method
 or 1-Cup V60), fine-tune the dose, then run a step-by-step pour timer with a
 countdown ring and sound alerts. Plain HTML/CSS/JS, no build step, no
 dependencies, no package.json.
@@ -37,11 +38,6 @@ there is no framework or router.
   `pourover.state.v1`) to remember the last recipe/dose/balance/strength.
 - **`styles.css`** — all styling; light theme for home/tune, dark theme for
   timer/done (`.screen-light` / `.screen-dark`).
-- **`serve.py`** — the static file server actually used in production (on
-  the Pi). Supports plain HTTP or HTTPS depending on args
-  (`serve.py <port>` vs `serve.py <port> <certfile> <keyfile>`). Not needed
-  for local dev (`python3 -m http.server` is simpler), but any behavior
-  change to how files are served belongs here, not in a new server.
 
 ### 4:6 Method dial-in
 
@@ -63,18 +59,8 @@ logic.
 
 ## Deployment
 
-Deployed on a Raspberry Pi (`pi-printer`, `192.168.50.175`) via two systemd
-services reading files live from disk — no restart needed after syncing.
-Full setup/redeploy/cert-trust instructions are in `README.md`; the common
-case is:
-
-```
-rsync -avz index.html styles.css app.js recipes.js pi-printer:/home/pi/pourover/
-```
-
-**Use https://pi-printer.local/ for actual brewing**, not the plain HTTP
-port — the Screen Wake Lock API (keeps the screen on during a brew) requires
-a secure context, and iOS Safari won't expose `navigator.wakeLock` over
-plain HTTP at all. This is why the HTTPS service and the mkcert-signed certs
-in `certs/` exist. See `README.md` for cert-trust setup on a new device and
-full from-scratch service setup if the Pi is ever reimaged.
+Hosted on Cloudflare Pages, deployed from this repo's git history. No build
+command or output directory config needed — it's plain static files served
+from the repo root. Cloudflare terminates HTTPS automatically, which is
+required for the Screen Wake Lock API (keeps the screen on during a brew) to
+work at all on iOS Safari.

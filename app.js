@@ -258,8 +258,7 @@
   });
 
   // ---------- wake lock ----------
-  // Requires a secure context (HTTPS or localhost) — see README for the
-  // HTTPS setup on pi-printer.
+  // Requires a secure context (HTTPS or localhost).
   let wakeLock = null;
 
   async function requestWakeLock() {
