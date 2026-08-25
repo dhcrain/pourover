@@ -51,15 +51,11 @@ everything else.
 
 Unlike a hand-rolled KV counter, writes are append-only (no read-modify-write
 race) and queries can be windowed by time, not just all-time totals. The
-tradeoff: reads only work through Cloudflare's external SQL API, not from
-inside the Worker, so there's no `/api/track?secret=...`-style JSON endpoint
-here — query it directly instead:
-
-**Dashboard:** Analytics & Logs → Analytics Engine → `pourover_stats` → SQL
-Playground.
-
-**CLI**, with a Cloudflare API token scoped to `Account Analytics: Read`
-(My Profile → API Tokens → Create Token):
+tradeoff: reads only work through Cloudflare's external SQL API — no
+dashboard UI (Cloudflare doesn't ship one for Analytics Engine) and no
+`/api/track?secret=...`-style JSON endpoint here. Query it directly with a
+Cloudflare API token scoped to `Account Analytics: Read` (dashboard → My
+Profile → API Tokens → Create Token):
 
 ```
 curl -s https://api.cloudflare.com/client/v4/accounts/2f005bc85fa106ef5efcbab654cc668e/analytics_engine/sql \
