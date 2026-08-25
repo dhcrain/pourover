@@ -276,6 +276,7 @@
       balanceId: state.balanceId,
       strengthId: state.strengthId,
     });
+    trackEvent("started", state.recipeId);
     beginCountdown();
   });
 

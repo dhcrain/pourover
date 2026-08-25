@@ -1,8 +1,8 @@
 // Worker in front of the static site. Routes /api/track (recipe-picked /
-// brew-completed counters, see README's "Recipe stats" section); everything
-// else falls through to the static assets.
+// timer-started / brew-completed counters, see README's "Recipe stats"
+// section); everything else falls through to the static assets.
 
-const VALID_EVENTS = new Set(["picked", "completed"]);
+const VALID_EVENTS = new Set(["picked", "started", "completed"]);
 const VALID_RECIPES = new Set(["foursix", "v60-hoffmann"]);
 
 export default {

@@ -39,10 +39,11 @@ there is no framework or router.
 - **`styles.css`** — all styling; light theme for home/tune, dark theme for
   timer/done (`.screen-light` / `.screen-dark`).
 - **`src/worker.js`** — the Cloudflare Worker in front of the static site.
-  Routes `/api/track` (recipe-picked/brew-completed counters, incremented in
-  the `POUROVER_STATS` KV namespace); everything else falls through to
-  `env.ASSETS.fetch()`, per `run_worker_first` in `wrangler.jsonc`. `app.js`'s
-  `trackEvent()` posts to it via `sendBeacon` and is a no-op without the
+  Routes `/api/track` (recipe-picked/timer-started/brew-completed counters,
+  incremented in the `POUROVER_STATS` KV namespace); everything else falls
+  through to `env.ASSETS.fetch()`, per `run_worker_first` in
+  `wrangler.jsonc`. `app.js`'s `trackEvent()` posts to it via `sendBeacon`
+  and is a no-op without the
   Worker (e.g. plain `python3 -m http.server` local dev). See README's
   "Recipe stats" section for the KV/secret setup, provisioned directly on
   the live Worker (not tracked in this repo).

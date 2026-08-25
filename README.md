@@ -42,7 +42,8 @@ despite living under the same "Workers & Pages" dashboard section.
 ## Recipe stats
 
 `app.js` fires a fire-and-forget `POST /api/track` (via `sendBeacon`) when a
-recipe is picked and again when a brew is followed through to the end.
+recipe is picked, again when the timer is started for it, and again when a
+brew is followed through to the end.
 `src/worker.js` increments a counter per `event:recipe` pair in the
 `POUROVER_STATS` KV namespace (bound in `wrangler.jsonc`). Missing locally,
 so `python3 -m http.server` still works fine for everything else.
@@ -50,7 +51,8 @@ so `python3 -m http.server` still works fine for everything else.
 KV namespace and the `STATS_SECRET` (gates the read endpoint below) are
 already provisioned on the live Worker. To view counts:
 `https://<your-worker-domain>/api/track?secret=<STATS_SECRET>` returns JSON
-like `{"picked:foursix": 41, "completed:foursix": 27, ...}`. The secret
+like `{"picked:foursix": 41, "started:foursix": 35, "completed:foursix":
+27, ...}`. The secret
 itself isn't in this repo — it's a Worker secret (`wrangler secret list
 --name pourover` shows it's set, not its value).
 
