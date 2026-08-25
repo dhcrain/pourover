@@ -6,3 +6,4 @@ CLAUDE.md
 plan.md
 .git/
 .gitignore
+.wrangler/
