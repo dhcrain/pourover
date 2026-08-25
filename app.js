@@ -363,7 +363,8 @@
     const frac = Math.min(1, Math.max(0, elapsed / step.durationSeconds));
     els.ringProgress.style.strokeDashoffset = String(RING_CIRCUMFERENCE * frac);
 
-    els.instructionMain.textContent = "Pour to " + step.totalWeight + "g total";
+    els.instructionMain.innerHTML =
+      "Pour to <span class=\"instruction-grams\">" + step.totalWeight + "g</span> total";
     els.instructionNote.textContent = step.note;
 
     const next = state.scaled.steps[state.stepIndex + 1];
@@ -414,7 +415,9 @@
   }
 
   function setPlayPauseIcon() {
-    els.playPause.innerHTML = state.running ? "&#10074;&#10074;" : "&#9654;";
+    els.playPause.innerHTML = state.running
+      ? "<span class=\"pause-icon\">&#10074; &#10074;</span>"
+      : "&#9654;";
     els.playPause.setAttribute("aria-label", state.running ? "Pause" : "Play");
   }
 
@@ -465,9 +468,17 @@
 
   // ---------- alerts: sound ----------
   let audioCtx = null;
+  function getAudioCtx() {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    // WebKit (Safari, and every iOS browser under it) can create a context
+    // in "suspended" state even from within a user gesture; resume() is a
+    // harmless no-op once it's already running.
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
   function playChime() {
     try {
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx = getAudioCtx();
       const now = audioCtx.currentTime;
       [880, 1320].forEach((freq, i) => {
         const osc = audioCtx.createOscillator();
@@ -487,7 +498,7 @@
   }
   function playTick() {
     try {
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx = getAudioCtx();
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();

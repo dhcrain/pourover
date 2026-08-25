@@ -105,7 +105,7 @@ button {
 }
 .taste-link:active { opacity: 0.7; }
 
-.site-footer { padding: 8px 20px 24px; text-align: center; }
+.site-footer { margin-top: auto; padding: 8px 20px 24px; text-align: center; }
 .github-link {
   display: inline-flex;
   align-items: center;
@@ -339,7 +339,8 @@ button {
 #timer-clock { font-size: 56px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
 .instruction-wrap { text-align: center; padding: 20px 28px 0; }
-#instruction-main { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+#instruction-main { font-size: 16px; font-weight: 600; margin: 0 0 6px; color: var(--dark-ink-soft); }
+.instruction-grams { font-size: 40px; font-weight: 700; color: var(--dark-ink); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 #instruction-note { font-size: 14px; color: var(--accent); margin: 0 0 14px; font-weight: 600; }
 #instruction-next { font-size: 14px; color: var(--dark-ink-soft); margin: 0; }
 
@@ -357,6 +358,7 @@ button {
   background: rgba(255,255,255,0.08);
   color: var(--dark-ink);
   font-size: 18px;
+  font-weight: 700;
   display: flex; align-items: center; justify-content: center;
 }
 .control-btn.primary {
@@ -366,6 +368,7 @@ button {
   font-size: 22px;
 }
 .control-btn:active { filter: brightness(0.9); }
+.pause-icon { display: inline-flex; gap: 5px; }
 
 .timer-controls.controls-hidden { visibility: hidden; }
 
