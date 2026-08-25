@@ -1,5 +1,5 @@
 // Worker in front of the static site. Routes /api/track (recipe-picked /
-// timer-started / brew-completed counters, see README's "Recipe stats"
+// timer-started / brew-completed events, see README's "Recipe stats"
 // section); everything else falls through to the static assets.
 
 const VALID_EVENTS = new Set(["picked", "started", "completed"]);
@@ -16,41 +16,24 @@ export default {
 };
 
 async function handleTrack(request, env) {
-  if (request.method === "POST") {
-    let body;
-    try {
-      body = await request.json();
-    } catch (e) {
-      return new Response("Bad request", { status: 400 });
-    }
-
-    const { event, recipe } = body || {};
-    if (!VALID_EVENTS.has(event) || !VALID_RECIPES.has(recipe)) {
-      return new Response("Bad request", { status: 400 });
-    }
-
-    const key = event + ":" + recipe;
-    const current = parseInt((await env.POUROVER_STATS.get(key)) || "0", 10);
-    await env.POUROVER_STATS.put(key, String(current + 1));
-
-    return new Response(null, { status: 204 });
+  if (request.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
   }
 
-  if (request.method === "GET") {
-    const url = new URL(request.url);
-    if (!env.STATS_SECRET || url.searchParams.get("secret") !== env.STATS_SECRET) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
-    const counts = {};
-    for (const event of VALID_EVENTS) {
-      for (const recipe of VALID_RECIPES) {
-        const key = event + ":" + recipe;
-        counts[key] = parseInt((await env.POUROVER_STATS.get(key)) || "0", 10);
-      }
-    }
-    return Response.json(counts);
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return new Response("Bad request", { status: 400 });
   }
 
-  return new Response("Method not allowed", { status: 405 });
+  const { event, recipe } = body || {};
+  if (!VALID_EVENTS.has(event) || !VALID_RECIPES.has(recipe)) {
+    return new Response("Bad request", { status: 400 });
+  }
+
+  // Fire-and-forget, per Analytics Engine's API — no await, no error thrown.
+  env.STATS.writeDataPoint({ blobs: [event, recipe], doubles: [1] });
+
+  return new Response(null, { status: 204 });
 }

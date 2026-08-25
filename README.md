@@ -16,7 +16,7 @@ Plain HTML/CSS/JS, no build step, no dependencies.
   `/api/track` (see "Recipe stats" below) and falls through to the static
   files for everything else
 - `wrangler.jsonc` — Worker config: static-assets binding, `run_worker_first`
-  routing, and the KV namespace binding
+  routing, and the Analytics Engine dataset binding
 
 ## Run locally
 
@@ -28,8 +28,8 @@ python3 -m http.server 8934
 
 Then open http://localhost:8934/ in a browser. This serves the static files
 directly, so `/api/track` calls just fail silently (no local Worker) — fine
-for UI work. To exercise the full Worker + KV locally, use `wrangler dev`
-instead (requires `npx wrangler`, see Deployment below).
+for UI work. To exercise the full Worker locally, use `wrangler dev` instead
+(requires `npx wrangler`, see Deployment below).
 
 ## Deployment
 
@@ -43,18 +43,35 @@ despite living under the same "Workers & Pages" dashboard section.
 
 `app.js` fires a fire-and-forget `POST /api/track` (via `sendBeacon`) when a
 recipe is picked, again when the timer is started for it, and again when a
-brew is followed through to the end.
-`src/worker.js` increments a counter per `event:recipe` pair in the
-`POUROVER_STATS` KV namespace (bound in `wrangler.jsonc`). Missing locally,
-so `python3 -m http.server` still works fine for everything else.
+brew is followed through to the end. `src/worker.js` writes each as an event
+(`{event, recipe}`, count 1) to the `pourover_stats` Workers Analytics
+Engine dataset (bound as `STATS` in `wrangler.jsonc`, auto-created on first
+write). Missing locally, so `python3 -m http.server` still works fine for
+everything else.
 
-KV namespace and the `STATS_SECRET` (gates the read endpoint below) are
-already provisioned on the live Worker. To view counts:
-`https://<your-worker-domain>/api/track?secret=<STATS_SECRET>` returns JSON
-like `{"picked:foursix": 41, "started:foursix": 35, "completed:foursix":
-27, ...}`. The secret
-itself isn't in this repo — it's a Worker secret (`wrangler secret list
---name pourover` shows it's set, not its value).
+Unlike a hand-rolled KV counter, writes are append-only (no read-modify-write
+race) and queries can be windowed by time, not just all-time totals. The
+tradeoff: reads only work through Cloudflare's external SQL API, not from
+inside the Worker, so there's no `/api/track?secret=...`-style JSON endpoint
+here — query it directly instead:
+
+**Dashboard:** Analytics & Logs → Analytics Engine → `pourover_stats` → SQL
+Playground.
+
+**CLI**, with a Cloudflare API token scoped to `Account Analytics: Read`
+(My Profile → API Tokens → Create Token):
+
+```
+curl -s https://api.cloudflare.com/client/v4/accounts/2f005bc85fa106ef5efcbab654cc668e/analytics_engine/sql \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "SELECT blob2 AS recipe, blob1 AS event, SUM(double1) AS count
+      FROM pourover_stats
+      WHERE timestamp > NOW() - INTERVAL '90' DAY
+      GROUP BY blob2, blob1
+      ORDER BY recipe, event"
+```
+
+Data retention is 90 days (Analytics Engine default).
 
 ## Keeping the screen awake
 
