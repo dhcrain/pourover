@@ -69,6 +69,27 @@
     }
   }
 
+  // ---------- analytics ----------
+  // Fire-and-forget counters (see src/worker.js). Silently does nothing
+  // where the endpoint isn't available, e.g. local dev.
+  function trackEvent(event, recipeId) {
+    try {
+      const payload = JSON.stringify({ event, recipe: recipeId });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+      } else {
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
+      }
+    } catch (e) {
+      /* tracking unavailable, ignore */
+    }
+  }
+
   // ---------- app state ----------
   const state = {
     recipeId: null,
@@ -123,6 +144,7 @@
     const prefs = loadPrefs();
     const recipe = getRecipe(recipeId);
     state.recipeId = recipeId;
+    trackEvent("picked", recipeId);
     state.doseGrams = prefs.recipeId === recipeId && prefs.doseGrams
       ? prefs.doseGrams
       : recipe.sizes.medium;
@@ -410,6 +432,7 @@
     cancelAnimationFrame(state.rafId);
     state.running = false;
     releaseWakeLock();
+    trackEvent("completed", state.recipeId);
     els.doneTime.textContent = "Total time " + fmtClock(state.scaled.totalEstimateSeconds);
     showScreen(els.screenDone);
   }
