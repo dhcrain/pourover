@@ -1,7 +1,7 @@
 {
   "name": "pourover",
   "main": "src/worker.js",
-  "compatibility_date": "2026-08-25",
+  "compatibility_date": "2026-08-24",
   "assets": {
     "directory": ".",
     "not_found_handling": "single-page-application",
@@ -9,5 +9,11 @@
   },
   "analytics_engine_datasets": [
     { "binding": "STATS", "dataset": "pourover_stats" }
-  ]
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
 }
