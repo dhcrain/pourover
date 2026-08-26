@@ -12,8 +12,7 @@ sound alerts). Plain HTML/CSS/JS. No build step, no deps, no package.json.
 python3 -m http.server 8934 --directory public
 ```
 
-Open http://localhost:8934/. No test suite, linter, or build — verify by
-exercising the UI in a browser (or `claude-in-chrome` tools).
+Open http://localhost:8934/.
 
 ## Layout
 
