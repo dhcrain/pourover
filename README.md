@@ -6,24 +6,12 @@ countdown ring and sound alerts.
 
 Plain HTML/CSS/JS, no build step, no dependencies.
 
-## Files
-
-- `index.html` — markup for all four screens (home, tune, timer, done)
-- `styles.css` — styling
-- `app.js` — app logic and state
-- `recipes.js` — recipe data and scaling math
-- `src/worker.js` — the Worker in front of the static site; routes
-  `/api/track` (see "Recipe stats" below) and falls through to the static
-  files for everything else
-- `wrangler.jsonc` — Worker config: static-assets binding, `run_worker_first`
-  routing, and the Analytics Engine dataset binding
-
 ## Run locally
 
 From this directory:
 
 ```
-python3 -m http.server 8934
+python3 -m http.server 8934 --directory public
 ```
 
 Then open http://localhost:8934/ in a browser. This serves the static files

@@ -1,78 +1,72 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## What this is
 
-**Grounds Control** — a static web app for timing pour-over coffee brews.
-Pick a recipe (4:6 Method
-or 1-Cup V60), fine-tune the dose, then run a step-by-step pour timer with a
-countdown ring and sound alerts. Plain HTML/CSS/JS, no build step, no
-dependencies, no package.json.
+**Grounds Control** — pour-over coffee timer. Pick a recipe (4:6 Method or
+1-Cup V60), tune the dose, run a step-by-step pour timer (countdown ring +
+sound alerts). Plain HTML/CSS/JS. No build step, no deps, no package.json.
 
 ## Run locally
 
 ```
-python3 -m http.server 8934
+python3 -m http.server 8934 --directory public
 ```
 
-Then open http://localhost:8934/. There is no test suite, linter, or build
-step — verify changes by exercising the UI in a browser (or via the
-`claude-in-chrome` tools if connected).
+Open http://localhost:8934/. No test suite, linter, or build — verify by
+exercising the UI in a browser (or `claude-in-chrome` tools).
 
-## Architecture
+## Layout
 
-Four screens live as `<section>`s in a single `index.html`, toggled by
-`showScreen()` in `app.js` via an `.active` class (home → tune → timer →
-done). All state is a single `state` object closed over in `app.js`'s IIFE;
-there is no framework or router.
+- `public/` — everything deployed (`index.html`, `app.js`, `recipes.js`,
+  `styles.css`). `wrangler.jsonc`'s `assets.directory` points here, so
+  nothing else at repo root needs excluding from deploy.
+- `src/worker.js` — Cloudflare Worker in front of the static site.
 
-- **`recipes.js`** — recipe data plus all scaling/timing math. Water amounts
-  are stored as *percent of total water*, not fixed grams, so
-  `scaleRecipe(recipe, doseGrams, balanceId, strengthId)` can produce a
-  correct step list for any dose. `getRecipe()` and `scaleRecipe()` are the
-  only entry points `app.js` calls into this file.
-- **`app.js`** — screen transitions, timer loop (via
-  `requestAnimationFrame`), dose/size steppers, Screen Wake Lock handling,
-  and Web Audio beeps/ticks. Reads/writes `localStorage` (key
-  `pourover.state.v1`) to remember the last recipe/dose/balance/strength.
-- **`styles.css`** — all styling; light theme for home/tune, dark theme for
-  timer/done (`.screen-light` / `.screen-dark`).
-- **`src/worker.js`** — the Cloudflare Worker in front of the static site.
-  Routes `/api/track` (recipe-picked/timer-started/brew-completed events,
-  written to the `pourover_stats` Workers Analytics Engine dataset, bound
-  as `STATS`); everything else falls through to `env.ASSETS.fetch()`, per
-  `run_worker_first` in `wrangler.jsonc`. `app.js`'s `trackEvent()` posts to
-  it via `sendBeacon` and is a no-op without the Worker (e.g. plain
-  `python3 -m http.server` local dev). Reads only work via Cloudflare's
-  external Analytics Engine SQL API, not from inside the Worker — see
-  README's "Recipe stats" section for query examples.
+## app.js / recipes.js / index.html
 
-### 4:6 Method dial-in
+- 4 screens (home → tune → timer → done) as `<section>`s in `index.html`,
+  toggled by `showScreen()` in `app.js` (`.active` class). No framework, no
+  router. One `state` object closed over in `app.js`'s IIFE.
+- `recipes.js` stores water as **percent of total**, not grams, so
+  `scaleRecipe(recipe, doseGrams, balanceId, strengthId)` works for any
+  dose. `getRecipe()` + `scaleRecipe()` are the only calls `app.js` makes
+  into this file.
+- `app.js` also owns: timer loop (`requestAnimationFrame`), dose/size
+  steppers, Screen Wake Lock, Web Audio beeps/ticks, `localStorage`
+  (key `pourover.state.v1`) for last recipe/dose/balance/strength.
+- `styles.css`: light theme (home/tune), dark theme (timer/done) —
+  `.screen-light` / `.screen-dark`.
 
-The 4:6 Method recipe is special-cased throughout `recipes.js` and `app.js`:
-its pour schedule isn't fixed like the V60's, but generated from two knobs —
-**Balance** (`BALANCE_OPTIONS`: sweet/even/acidic — how the first 40% of
-water splits into 2 pours) and **Strength** (`STRENGTH_OPTIONS`:
-light/medium/strong — how many pours make up the remaining 60%, 2/3/4
-respectively). `buildFourSixBreakpoints()` in `recipes.js` turns those two
-IDs into percent breakpoints; `scaleRecipe()` only takes this path when
-`recipe.id === "foursix"`. The tune screen shows segmented controls and a
-bar chart (`renderPourChart()` in `app.js`) only when the selected recipe is
-`"foursix"` — see the `.dialin-section` toggle in `openTune()`/`renderTune()`.
+## 4:6 Method dial-in
 
-These ratios/pour-counts are sourced from `46recipie.png` (Tetsu Kasuya's
-published 4:6 chart) and are stored as fractions, not grams, so they scale to
-any dose automatically — do not hardcode gram amounts when adjusting this
-logic.
+Special-cased in both `recipes.js` and `app.js` — pour schedule isn't fixed
+like the V60's, it's generated from two knobs:
+
+- **Balance** (`BALANCE_OPTIONS`: sweet/even/acidic) — how the first 40%
+  splits into 2 pours.
+- **Strength** (`STRENGTH_OPTIONS`: light/medium/strong) — how many pours
+  make up the remaining 60% (2/3/4).
+
+`buildFourSixBreakpoints()` turns those into percent breakpoints;
+`scaleRecipe()` only takes this path when `recipe.id === "foursix"`. Tune
+screen shows the segmented controls + bar chart (`renderPourChart()`) only
+for `"foursix"` — see `.dialin-section` in `openTune()`/`renderTune()`.
+
+## Worker (`src/worker.js`)
+
+- Routes `/api/track` (recipe-picked/timer-started/brew-completed) to the
+  `pourover_stats` Analytics Engine dataset (bound `STATS`). Everything
+  else falls through to `env.ASSETS.fetch()` (`run_worker_first` in
+  `wrangler.jsonc`).
+- `app.js`'s `trackEvent()` posts via `sendBeacon` — no-op without the
+  Worker (e.g. local `python3 -m http.server`).
+- Reads only work via Cloudflare's external Analytics Engine SQL API, not
+  from inside the Worker. Query examples: README → "Recipe stats".
 
 ## Deployment
 
-Hosted as a **Cloudflare Worker with static assets** (Workers & Pages →
-pourover → production) — not Cloudflare Pages, despite living under the same
-dashboard section. Cloudflare's Workers Builds deploys automatically on push
-to `main`, running `npx wrangler deploy` against `wrangler.jsonc`; no local
-`node_modules`/`package.json` needed or wanted (keep this repo
-dependency-free — see "What this is"). Cloudflare terminates HTTPS
-automatically, which is required for the Screen Wake Lock API (keeps the
-screen on during a brew) to work at all on iOS Safari.
+Cloudflare Worker with static assets (Workers & Pages → pourover →
+production) — **not** Pages, despite the dashboard section name. Workers
+Builds auto-deploys on push to `main` (`npx wrangler deploy`). No
+`node_modules`/`package.json` — keep it dependency-free. HTTPS (automatic
+here) is required for Screen Wake Lock to work on iOS Safari.

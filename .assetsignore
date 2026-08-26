@@ -1,9 +1,0 @@
-src/
-wrangler.jsonc
-.assetsignore
-README.md
-CLAUDE.md
-plan.md
-.git/
-.gitignore
-.wrangler/
