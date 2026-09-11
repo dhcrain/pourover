@@ -545,4 +545,12 @@
   // ---------- init ----------
   renderHome();
   showScreen(els.screenHome);
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {
+        /* offline support unavailable, ignore */
+      });
+    });
+  }
 })();

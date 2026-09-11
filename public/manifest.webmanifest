@@ -1,0 +1,16 @@
+{
+  "name": "Grounds Control",
+  "short_name": "Grounds Control",
+  "description": "Pour-over coffee timer with 4:6 Method and 1-Cup V60 recipes.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#16110e",
+  "theme_color": "#1c1512",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

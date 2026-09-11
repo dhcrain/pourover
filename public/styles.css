@@ -32,7 +32,13 @@ button {
   border: none;
   background: none;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
+
+a { -webkit-touch-callout: default; }
 
 .screen {
   display: none;
