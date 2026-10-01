@@ -123,6 +123,29 @@ a { -webkit-touch-callout: default; }
 }
 .github-link:active { opacity: 0.7; }
 
+.stats-link {
+  display: block;
+  margin: 0 auto 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: underline;
+}
+
+/* ---------- STATS ---------- */
+.stats-note { margin: 4px 0 16px; color: var(--ink-soft); font-size: 14px; }
+.stats-status { margin: 12px 0 0; font-size: 14px; color: var(--ink-soft); }
+.stats-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.stats-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.stats-card h3 { margin: 0 0 8px; font-size: 16px; }
+.stats-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; }
+.stats-row b { font-variant-numeric: tabular-nums; }
+
 /* ---------- TUNE ---------- */
 .tune-header {
   display: flex;

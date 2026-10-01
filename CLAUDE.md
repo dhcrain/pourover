@@ -59,8 +59,10 @@ for `"foursix"` — see `.dialin-section` in `openTune()`/`renderTune()`.
   `wrangler.jsonc`).
 - `app.js`'s `trackEvent()` posts via `sendBeacon` — no-op without the
   Worker (e.g. local `python3 -m http.server`).
-- Reads only work via Cloudflare's external Analytics Engine SQL API, not
-  from inside the Worker. Query examples: README → "Recipe stats".
+- `GET /api/stats` queries the external Analytics Engine SQL API over HTTP
+  (needs `CF_API_TOKEN` secret + `ACCOUNT_ID` var); the stats screen in
+  `app.js` calls it only on an explicit "Load stats" tap. Reads can't use
+  the `STATS` binding. Query examples: README → "Recipe stats".
 
 ## Deployment
 
