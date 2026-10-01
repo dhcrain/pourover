@@ -33,7 +33,6 @@ async function handleStats(request, env) {
   const sql =
     "SELECT blob2 AS recipe, blob1 AS event, SUM(double1) AS count " +
     "FROM pourover_stats " +
-    "WHERE timestamp > NOW() - INTERVAL '90' DAY " +
     "GROUP BY blob2, blob1";
 
   let res;
@@ -58,7 +57,7 @@ async function handleStats(request, env) {
   }
 
   return Response.json(
-    { days: 90, recipes },
+    { recipes },
     { headers: { "Cache-Control": "public, max-age=60" } }
   );
 }
