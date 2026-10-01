@@ -37,6 +37,12 @@ Engine dataset (bound as `STATS` in `wrangler.jsonc`, auto-created on first
 write). Missing locally, so `python3 -m http.server` still works fine for
 everything else.
 
+The home screen's "Recipe stats" link opens a public stats screen. Counts
+load only when "Load stats" is tapped, via `GET /api/stats`, which has the
+Worker query the SQL API (90-day window, cached 60s). One-time setup:
+`npx wrangler secret put CF_API_TOKEN` with an `Account Analytics: Read`
+token (`ACCOUNT_ID` is a plain var in `wrangler.jsonc`).
+
 Unlike a hand-rolled KV counter, writes are append-only (no read-modify-write
 race) and queries can be windowed by time, not just all-time totals. The
 tradeoff: reads only work through Cloudflare's external SQL API — no

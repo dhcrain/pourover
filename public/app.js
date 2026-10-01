@@ -11,8 +11,15 @@
 
     screenHome: document.getElementById("screen-home"),
     screenTune: document.getElementById("screen-tune"),
+    screenStats: document.getElementById("screen-stats"),
     screenTimer: document.getElementById("screen-timer"),
     screenDone: document.getElementById("screen-done"),
+
+    statsLink: document.getElementById("stats-link"),
+    statsBack: document.getElementById("stats-back"),
+    statsLoad: document.getElementById("stats-load"),
+    statsStatus: document.getElementById("stats-status"),
+    statsList: document.getElementById("stats-list"),
 
     tuneBack: document.getElementById("tune-back"),
     tuneTitle: document.getElementById("tune-title"),
@@ -90,6 +97,38 @@
     }
   }
 
+  // ---------- stats screen ----------
+  // Loaded only on an explicit tap, never on page load.
+  async function loadStats() {
+    els.statsLoad.disabled = true;
+    els.statsStatus.textContent = "Loading...";
+    els.statsList.innerHTML = "";
+    try {
+      const res = await fetch("/api/stats");
+      if (!res.ok) throw new Error("bad status");
+      const data = await res.json();
+      RECIPES.forEach((r) => {
+        const c = data.recipes[r.id] || { picked: 0, started: 0, completed: 0 };
+        const card = document.createElement("div");
+        card.className = "stats-card";
+        card.innerHTML =
+          "<h3>" + r.name + "</h3>" +
+          '<div class="stats-row"><span>Picked</span><b>' + c.picked + "</b></div>" +
+          '<div class="stats-row"><span>Timer started</span><b>' + c.started + "</b></div>" +
+          '<div class="stats-row"><span>Brew completed</span><b>' + c.completed + "</b></div>";
+        els.statsList.appendChild(card);
+      });
+      els.statsStatus.textContent = "";
+    } catch (e) {
+      els.statsStatus.textContent = "Stats unavailable right now.";
+    }
+    els.statsLoad.disabled = false;
+    els.statsLoad.textContent = "Reload stats";
+  }
+  els.statsLink.addEventListener("click", () => showScreen(els.screenStats));
+  els.statsBack.addEventListener("click", () => showScreen(els.screenHome));
+  els.statsLoad.addEventListener("click", loadStats);
+
   // ---------- app state ----------
   const state = {
     recipeId: null,
@@ -115,7 +154,7 @@
   }
 
   function showScreen(el) {
-    [els.screenHome, els.screenTune, els.screenTimer, els.screenDone].forEach((s) =>
+    [els.screenHome, els.screenTune, els.screenStats, els.screenTimer, els.screenDone].forEach((s) =>
       s.classList.remove("active")
     );
     el.classList.add("active");

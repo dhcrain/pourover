@@ -51,6 +51,7 @@
   </section>
 
   <footer class="site-footer">
+    <button id="stats-link" class="stats-link">Recipe stats</button>
     <a
       class="github-link"
       href="https://github.com/dhcrain/pourover"
@@ -71,6 +72,21 @@
       <span>View on GitHub</span>
     </a>
   </footer>
+</section>
+
+<!-- STATS SCREEN -->
+<section id="screen-stats" class="screen screen-light">
+  <header class="tune-header">
+    <button id="stats-back" class="icon-btn" aria-label="Back">&#8592;</button>
+    <h2>Recipe stats</h2>
+    <span class="icon-btn spacer"></span>
+  </header>
+  <div class="tune-body">
+    <p class="stats-note">Brews across all users, last 90 days.</p>
+    <button id="stats-load" class="primary-btn">Load stats</button>
+    <p id="stats-status" class="stats-status" role="status"></p>
+    <div id="stats-list" class="stats-list"></div>
+  </div>
 </section>
 
 <!-- TUNE SCREEN -->
