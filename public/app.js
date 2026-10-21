@@ -17,7 +17,6 @@
 
     statsLink: document.getElementById("stats-link"),
     statsBack: document.getElementById("stats-back"),
-    statsLoad: document.getElementById("stats-load"),
     statsStatus: document.getElementById("stats-status"),
     statsList: document.getElementById("stats-list"),
 
@@ -98,9 +97,8 @@
   }
 
   // ---------- stats screen ----------
-  // Loaded only on an explicit tap, never on page load.
+  // Loaded each time the stats screen is opened, never on page load.
   async function loadStats() {
-    els.statsLoad.disabled = true;
     els.statsStatus.textContent = "Loading...";
     els.statsList.innerHTML = "";
     try {
@@ -122,12 +120,12 @@
     } catch (e) {
       els.statsStatus.textContent = "Stats unavailable right now.";
     }
-    els.statsLoad.disabled = false;
-    els.statsLoad.textContent = "Reload stats";
   }
-  els.statsLink.addEventListener("click", () => showScreen(els.screenStats));
+  els.statsLink.addEventListener("click", () => {
+    showScreen(els.screenStats);
+    loadStats();
+  });
   els.statsBack.addEventListener("click", () => showScreen(els.screenHome));
-  els.statsLoad.addEventListener("click", loadStats);
 
   // ---------- app state ----------
   const state = {
