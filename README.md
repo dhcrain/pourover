@@ -38,7 +38,7 @@ write). Missing locally, so `python3 -m http.server` still works fine for
 everything else.
 
 The home screen's "Recipe stats" link opens a public stats screen. Counts
-load only when "Load stats" is tapped, via `GET /api/stats`, which has the
+load when the screen is opened (not on page load), via `GET /api/stats`, which has the
 Worker query the SQL API (all stored data, cached 60s). One-time setup:
 `npx wrangler secret put CF_API_TOKEN` with an `Account Analytics: Read`
 token (`ACCOUNT_ID` is a plain var in `wrangler.jsonc`).

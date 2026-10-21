@@ -61,7 +61,7 @@ for `"foursix"` — see `.dialin-section` in `openTune()`/`renderTune()`.
   Worker (e.g. local `python3 -m http.server`).
 - `GET /api/stats` queries the external Analytics Engine SQL API over HTTP
   (needs `CF_API_TOKEN` secret + `ACCOUNT_ID` var); the stats screen in
-  `app.js` calls it only on an explicit "Load stats" tap. Reads can't use
+  `app.js` calls it each time the screen is opened (not on page load). Reads can't use
   the `STATS` binding. Query examples: README → "Recipe stats".
 
 ## Deployment
