@@ -515,7 +515,14 @@
 
   els.playPause.addEventListener("click", togglePlayPause);
   els.skipBack.addEventListener("click", () => jumpToStep(state.stepIndex - 1));
-  els.skipFwd.addEventListener("click", () => jumpToStep(state.stepIndex + 1));
+  els.skipFwd.addEventListener("click", () => {
+    if (state.countingDown) return;
+    if (state.stepIndex >= state.scaled.steps.length - 1) {
+      finishBrew();
+      return;
+    }
+    jumpToStep(state.stepIndex + 1);
+  });
   els.timerRestart.addEventListener("click", restartTimer);
   els.timerClose.addEventListener("click", () => {
     clearTimers();
