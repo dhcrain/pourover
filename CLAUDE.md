@@ -57,6 +57,9 @@ for `"foursix"` — see `.dialin-section` in `openTune()`/`renderTune()`.
   `pourover_stats` Analytics Engine dataset (bound `STATS`). Everything
   else falls through to `env.ASSETS.fetch()` (`run_worker_first` in
   `wrangler.jsonc`).
+- Events carry an anonymous visitor id (`blob3`, from `localStorage`) for
+  unique counts; `looksLikeBot()` in the Worker drops bot traffic before
+  `writeDataPoint`. Stats queries ignore rows with empty `blob3`.
 - `app.js`'s `trackEvent()` posts via `sendBeacon` — no-op without the
   Worker (e.g. local `python3 -m http.server`).
 - `GET /api/stats` queries the external Analytics Engine SQL API over HTTP
