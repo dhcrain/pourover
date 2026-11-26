@@ -15,6 +15,11 @@ export default {
     if (url.pathname === "/api/stats") {
       return handleStats(request, env);
     }
+    // run_worker_first sends every /api/* here. Unknown ones (bots probing
+    // /api/.env etc.) get a plain 404 instead of the static-asset fallback.
+    if (url.pathname.startsWith("/api/")) {
+      return new Response("Not found", { status: 404 });
+    }
     return env.ASSETS.fetch(request);
   },
 };
