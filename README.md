@@ -37,6 +37,12 @@ Engine dataset (bound as `STATS` in `wrangler.jsonc`, auto-created on first
 write). Missing locally, so `python3 -m http.server` still works fine for
 everything else.
 
+Each event also carries an anonymous random visitor id (`pourover.visitor.v1`
+in `localStorage`, stored as `blob3`), which the stats screen uses for unique
+visitor counts. `/api/track` drops likely bots (bot user agents, Cloudflare
+verified bots, non-same-origin requests) before writing. Rows written before
+this change have no visitor id and are excluded from the stats queries.
+
 The home screen's "Recipe stats" link opens a public stats screen. Counts
 load when the screen is opened (not on page load), via `GET /api/stats`, which has the
 Worker query the SQL API (all stored data, cached 60s). One-time setup:

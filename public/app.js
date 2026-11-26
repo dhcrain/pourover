@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "pourover.state.v1";
+  const VISITOR_KEY = "pourover.visitor.v1";
   const RING_RADIUS = 108;
   const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
   const PRE_COUNTDOWN_SECONDS = 3;
@@ -19,6 +20,7 @@
     statsBack: document.getElementById("stats-back"),
     statsStatus: document.getElementById("stats-status"),
     statsList: document.getElementById("stats-list"),
+    statsVisitors: document.getElementById("stats-visitors"),
 
     tuneBack: document.getElementById("tune-back"),
     tuneTitle: document.getElementById("tune-title"),
@@ -78,9 +80,23 @@
   // ---------- analytics ----------
   // Fire-and-forget counters (see src/worker.js). Silently does nothing
   // where the endpoint isn't available, e.g. local dev.
+  // Anonymous random id, stored only in this browser, used to count unique visitors.
+  function visitorId() {
+    try {
+      let id = localStorage.getItem(VISITOR_KEY);
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem(VISITOR_KEY, id);
+      }
+      return id;
+    } catch (e) {
+      return crypto.randomUUID();
+    }
+  }
+
   function trackEvent(event, recipeId) {
     try {
-      const payload = JSON.stringify({ event, recipe: recipeId });
+      const payload = JSON.stringify({ event, recipe: recipeId, visitor: visitorId() });
       if (navigator.sendBeacon) {
         navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
       } else {
@@ -106,17 +122,20 @@
       if (!res.ok) throw new Error("bad status");
       const data = await res.json();
       RECIPES.forEach((r) => {
-        const c = data.recipes[r.id] || { picked: 0, started: 0, completed: 0 };
+        const c = data.recipes[r.id] || { picked: 0, started: 0, completed: 0, visitors: {} };
+        const v = c.visitors || {};
         const card = document.createElement("div");
         card.className = "stats-card";
         card.innerHTML =
           "<h3>" + r.name + "</h3>" +
           '<div class="stats-row"><span>Picked</span><b>' + c.picked + "</b></div>" +
           '<div class="stats-row"><span>Timer started</span><b>' + c.started + "</b></div>" +
-          '<div class="stats-row"><span>Brew completed</span><b>' + c.completed + "</b></div>";
+          '<div class="stats-row"><span>Brew completed</span><b>' + c.completed + "</b></div>" +
+          '<div class="stats-row"><span>Unique brewers</span><b>' + (v.completed || 0) + "</b></div>";
         els.statsList.appendChild(card);
       });
       els.statsStatus.textContent = "";
+      els.statsVisitors.textContent = "Unique visitors: " + (data.uniqueVisitors || 0);
     } catch (e) {
       els.statsStatus.textContent = "Stats unavailable right now.";
     }
